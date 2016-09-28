@@ -8,15 +8,16 @@ import (
 
 type ResultDataContent string
 
-const (
-	ContentRow   ResultDataContent = "row"
-	ContentGraph ResultDataContent = "graph"
+var (
+	ContentJustRow     = []ResultDataContent{"row"}
+	ContentJustGraph   = []ResultDataContent{"graph"}
+	ContentRowAndGraph = []ResultDataContent{"row", "graph"}
 )
 
 type Endpoints struct {
 	// Extensions map[string]interface{} // not sure what this actually looks like.
 	NodeBase          string `json:"node"`
-	RelationshipBase  string `json:"relationship"`
+	Relationship      string `json:"relationship"`
 	NodeIndex         string `json:"node_index"`
 	RelationshipTypes string `json:"relationship_types"` // return []string
 	ExtensionsInfo    string `json:"extensions_info"`
@@ -26,7 +27,7 @@ type Endpoints struct {
 	Constraints       string
 	NodeLabels        string `json:"node_labels"`
 	Version           string `json:"neo4j_version"`
-	TransactionBase   string `json:"transaction"`
+	Transaction       string `json:"transaction"`
 }
 
 // /node/:id response
@@ -55,15 +56,19 @@ type Endpoints struct {
 // }
 
 func (e *Endpoints) ImmediateCommit() string {
-	return e.TransactionBase + "/commit"
+	return e.Transaction + "/commit"
 }
 
 func (e *Endpoints) Commit(id string) string {
-	return e.TransactionBase + "/" + id + "/commit"
+	return e.Transaction + "/" + id + "/commit"
 }
 
 func (e *Endpoints) Node(id string) string {
 	return e.NodeBase + "/" + id
+}
+
+func (e *Endpoints) NodeProperties(id string) string {
+	return e.NodeBase + "/" + id + "/properties"
 }
 
 type DB struct {
@@ -107,7 +112,7 @@ type TransactionResult struct {
 
 type Datum struct {
 	Row   []*json.RawMessage
-	Meta  [1][]Meta // Not sure why this is always in inner array.
+	Meta  []interface{} // Not sure why this is always in inner array.
 	Graph Graph
 }
 
@@ -139,13 +144,13 @@ type Meta struct {
 type Statement struct {
 	Statement string `json:"statement"`
 	// statement          string              `json:"statement"`
-	Parameters         Params              `json:"parameters"`
+	Params             interface{}         `json:"parameters"`
 	ResultDataContents []ResultDataContent `json:"resultDataContents,omitempty"`
 	IncludeStats       bool                `json:"includeStats,omitempty"`
 }
 
 type Params map[string]interface{}
 
-type Transaction struct {
+type Commit struct {
 	Statements []Statement `json:"statements"`
 }

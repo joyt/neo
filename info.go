@@ -17,6 +17,18 @@ type IndexInfo struct {
 	Label        string
 }
 
+type Constraint struct {
+	PropertyKeys []string `json:"property_keys"`
+	Label        string
+	Type         string
+}
+
+// Constraints returns all the constraints defined on this database.
+func (db *DB) Constraints() ([]Constraint, error) {
+	var res []Constraint
+	return res, db.get(db.endpoints.Constraints, &res)
+}
+
 // Indexes returns all the indexes created on this database.
 func (db *DB) Indexes() ([]IndexInfo, error) {
 	var res []IndexInfo
