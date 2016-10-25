@@ -1,12 +1,15 @@
 package neo
 
 import (
+	"crypto/tls"
 	"errors"
 	"net/http"
 )
 
 func Connect(addr string, creds Creds) (*DB, error) {
-	db := &DB{addr: addr, creds: creds, c: &http.Client{}}
+	db := &DB{addr: addr, creds: creds, c: &http.Transport{
+		TLSClientConfig: tls.Config{InsecureSkipVerify: true},
+	}}
 	if err := db.get(addr+"/db/data/", &db.endpoints); err != nil {
 		return nil, err
 	}
