@@ -45,6 +45,9 @@ func (r TransactionResult) UnmarshalRows(res interface{}) error {
 			m = reflect.MakeMap(elemType)
 		}
 		for j, c := range r.Columns {
+			if datum.Row[j] == nil {
+				continue
+			}
 			var v interface{}
 			var p reflect.Value
 			if elemType.Kind() == reflect.Struct {
